@@ -1,17 +1,30 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Computer Benchmark</title>
-  </head>
-  <body>
-    <h1>Computer Benchmark</h1>
-    <form>
-      <label for="script-file">Upload a Python script:</label>
-      <input type="file" id="script-file" accept=".py">
-      <button type="submit" id="submit-button">Submit</button>
-    </form>
-    <div id="score-container"></div>
-    <script src="script.js"></script>
-  </body>
+<head>
+    <title>AGC Benchmark</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div id="header">
+        <h1>AGC Benchmark</h1>
+    </div>
+    <div id="content">
+        <p>
+            Welcome to the AGC benchmarking tool! Click the button below to run the benchmark test and see how much more powerful your computer is compared to the AGC.
+        </p>
+        <form action="/run_script" method="POST" enctype="multipart/form-data">
+            <div>
+                <label for="file">Upload Python script:</label>
+                <input type="file" id="file" name="file">
+            </div>
+            <button type="submit">Run Benchmark</button>
+        </form>
+        {% if score %}
+        <div id="score-container">
+            <p>Your computer is {{ score }} times more powerful than the AGC!</p>
+        </div>
+        {% endif %}
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
 </html>

@@ -1,16 +1,35 @@
-from flask import Flask, request, jsonify
-import subprocess
+from flask import Flask, request, render_template
+import os
 
 app = Flask(__name__)
 
+UPLOAD_FOLDER = 'uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 @app.route('/run_script', methods=['POST'])
 def run_script():
+    if 'file' not in request.files:
+        return 'No file uploaded', 400
+
     file = request.files['file']
-    file.save('uploaded_script.py')
+    if file.filename == '':
+        return 'No file selected', 400
 
-    result = subprocess.run(['python', 'benchmark.py', 'uploaded_script.py'], capture_output=True)
-    score = json.loads(result.stdout)['score']
+    if file:
+        filename = 'benchmark_result.txt'
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
 
-    return jsonify({'score': score})
+        with open(filepath, 'r') as f:
+            score = f.read().strip()
 
-if __name__ == '__main
+        os.remove(filepath)
+
+        return render_template('index.html', score=score)
+
+if __name__ == '__main__':
+    app.run()
