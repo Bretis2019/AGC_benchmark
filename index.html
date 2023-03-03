@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <title>Computer Benchmark</title>
-    <link rel="stylesheet" href="styles.css">
   </head>
   <body>
-    <div class="container">
-      <h1>Computer Benchmark</h1>
-      <p>Enter your computer's FLOPS score below:</p>
-      <input type="number" id="flops-score">
-      <button onclick="calculateScore()">Calculate Score</button>
-      <div id="score-container"></div>
-    </div>
+    <h1>Computer Benchmark</h1>
+    <form>
+      <label for="script-file">Upload a Python script:</label>
+      <input type="file" id="script-file" accept=".py">
+      <button type="submit" id="submit-button">Submit</button>
+    </form>
+    <div id="score-container"></div>
     <script src="script.js"></script>
   </body>
 </html>
