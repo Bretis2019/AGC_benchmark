@@ -1,30 +1,18 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>AGC Benchmark</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-    <div id="header">
-        <h1>AGC Benchmark</h1>
+  <head>
+    <meta charset="utf-8">
+    <title>Computer Benchmark</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="container">
+      <h1>Computer Benchmark</h1>
+      <p>Enter your computer's FLOPS score below:</p>
+      <input type="number" id="flops-score">
+      <button onclick="calculateScore()">Calculate Score</button>
+      <div id="score-container"></div>
     </div>
-    <div id="content">
-        <p>
-            Welcome to the AGC benchmarking tool! Click the button below to run the benchmark test and see how much more powerful your computer is compared to the AGC.
-        </p>
-        <form action="/run_script" method="POST" enctype="multipart/form-data">
-            <div>
-                <label for="file">Upload Python script:</label>
-                <input type="file" id="file" name="file">
-            </div>
-            <button type="submit">Run Benchmark</button>
-        </form>
-        {% if score %}
-        <div id="score-container">
-            <p>Your computer is {{ score }} times more powerful than the AGC!</p>
-        </div>
-        {% endif %}
-    </div>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>
