@@ -1,12 +1,46 @@
-button {
-  background-color: #4CAF50; /* Green */
-  border: none;
-  color: white;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f7f7f7;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+}
+
+form {
+  margin-top: 30px;
+}
+
+label {
+  font-weight: bold;
+}
+
+input[type="file"] {
+  margin-bottom: 15px;
+}
+
+button[type="submit"] {
+  background-color: #00aaff;
+  color: #fff;
   font-size: 16px;
-  margin: 4px 2px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
   cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button[type="submit"]:hover {
+  background-color: #0088cc;
+}
+
+#score-container {
+  margin-top: 30px;
+  font-size: 24px;
+  font-weight: bold;
 }
