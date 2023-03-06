@@ -1,45 +1,59 @@
+// Select the DOM elements
 const teamsContainer = document.getElementById('teams-container');
 const addTeamForm = document.getElementById('add-team-form');
 
-// Function to create a new team card element
-function createTeamCard(team) {
-  const teamCard = document.createElement('div');
-  teamCard.classList.add('team-card');
+// Event listener for submitting the add team form
+addTeamForm.addEventListener('submit', addTeam);
 
-  const nameElement = document.createElement('h2');
-  nameElement.textContent = team.name;
-  teamCard.appendChild(nameElement);
-
-  const playersElement = document.createElement('p');
-  playersElement.textContent = `Number of players: ${team.players}`;
-  teamCard.appendChild(playersElement);
-
-  const locationElement = document.createElement('p');
-  locationElement.textContent = `Location: ${team.location}`;
-  teamCard.appendChild(locationElement);
-
-  const contactButton = document.createElement('button');
-  contactButton.textContent = 'Contact Team';
-  contactButton.addEventListener('click', () => {
-    const contactInfo = document.createElement('p');
-    contactInfo.textContent = `Email: ${team.contact}`;
-    teamCard.appendChild(contactInfo);
-    contactButton.remove();
-  });
-  teamCard.appendChild(contactButton);
-
-  teamsContainer.appendChild(teamCard);
+// Function to fetch the teams data from the JSON file
+async function getTeams() {
+  try {
+    const response = await fetch('teams.json');
+    const teams = await response.json();
+    teams.forEach(team => createTeamCard(team));
+  } catch (error) {
+    console.error(error);
+  }
 }
 
-// Function to load the teams data from the JSON file
-function loadTeams() {
-  fetch('teams.json')
-    .then(response => response.json())
-    .then(teams => {
-      teams.forEach(team => {
-        createTeamCard(team);
-      });
-    });
+// Function to create a new team card and append it to the container
+function createTeamCard(team) {
+  // Create the card element
+  const card = document.createElement('div');
+  card.classList.add('team-card');
+
+  // Create the card header element
+  const cardHeader = document.createElement('div');
+  cardHeader.classList.add('team-card-header');
+
+  // Create the card title element
+  const cardTitle = document.createElement('h2');
+  cardTitle.classList.add('team-card-title');
+  cardTitle.textContent = team.name;
+
+  // Create the card subtitle element
+  const cardSubtitle = document.createElement('h3');
+  cardSubtitle.classList.add('team-card-subtitle');
+  cardSubtitle.textContent = `${team.players} players · ${team.location}`;
+
+  // Create the card body element
+  const cardBody = document.createElement('div');
+  cardBody.classList.add('team-card-body');
+
+  // Create the card contact element
+  const cardContact = document.createElement('p');
+  cardContact.classList.add('team-card-contact');
+  cardContact.textContent = team.contact;
+
+  // Append the elements to the card
+  cardHeader.appendChild(cardTitle);
+  cardHeader.appendChild(cardSubtitle);
+  cardBody.appendChild(cardContact);
+  card.appendChild(cardHeader);
+  card.appendChild(cardBody);
+
+  // Append the card to the container
+  teamsContainer.appendChild(card);
 }
 
 // Function to add a new team to the JSON file and display its card
@@ -52,7 +66,7 @@ function addTeam(event) {
 
   const newTeam = { name, players: parseInt(players), location, contact };
 
-  fetch('teams.json', {
+  fetch('https://formspree.io/f/mbjeyegq', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -66,6 +80,5 @@ function addTeam(event) {
     });
 }
 
-// Load the initial teams data and set up the form submit event listener
-loadTeams();
-addTeamForm.addEventListener('submit', addTeam);
+// Fetch the teams data when the page loads
+getTeams();
