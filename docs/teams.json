@@ -1,0 +1,5 @@
+[
+  { "name": "Team A", "players": 12, "location": "City X", "contact": "teamA@example.com" },
+  { "name": "Team B", "players": 10, "location": "City Y", "contact": "teamB@example.com" },
+  { "name": "Team C", "players": 15, "location": "City Z", "contact": "teamC@example.com" }
+]
