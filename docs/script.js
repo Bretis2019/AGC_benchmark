@@ -5,16 +5,51 @@ const addTeamForm = document.getElementById('add-team-form');
 // Event listener for submitting the add team form
 addTeamForm.addEventListener('submit', addTeam);
 
-// Function to fetch the teams data from the JSON file
-async function getTeams() {
+// Function to add a new team to the JSON file and display its card
+async function addTeam(event) {
+  event.preventDefault();
+  const name = addTeamForm.elements['name-input'].value;
+  const players = addTeamForm.elements['players-input'].value;
+  const location = addTeamForm.elements['location-input'].value;
+  const contact = addTeamForm.elements['contact-input'].value;
+
+  const newTeam = { name, players: parseInt(players), location, contact };
+
   try {
-    const response = await fetch('teams.json');
-    const teams = await response.json();
-    teams.forEach(team => createTeamCard(team));
+    // Send the new team data to Formspree
+    const response = await fetch('https://formspree.io/f/<your-formspree-form-id>', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newTeam)
+    });
+    const team = await response.json();
+
+    // Update the local teams array and the teams.json file
+    const teamsResponse = await fetch('teams.json');
+    let teams = await teamsResponse.json();
+    teams.push(team);
+    const updateResponse = await fetch('teams.json', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(teams)
+    });
+
+    // If the update was successful, create the new team card
+    if (updateResponse.ok) {
+      createTeamCard(team);
+      addTeamForm.reset();
+    } else {
+      console.error('Failed to update teams.json');
+    }
   } catch (error) {
     console.error(error);
   }
 }
+
 
 // Function to create a new team card and append it to the container
 function createTeamCard(team) {
