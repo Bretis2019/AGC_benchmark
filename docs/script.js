@@ -1,9 +1,33 @@
-// Select the DOM elements
-const teamsContainer = document.getElementById('teams-container');
-const addTeamForm = document.getElementById('add-team-form');
+// Get the teams from the JSON file
+async function getTeams() {
+  const response = await fetch('teams.json');
+  const teams = await response.json();
+  teams.forEach(team => {
+    createTeamCard(team);
+  });
+}
 
-// Event listener for submitting the add team form
-addTeamForm.addEventListener('submit', addTeam);
+// Create a new team card
+function createTeamCard(team) {
+  const teamsContainer = document.getElementById('teams-container');
+
+  const teamCard = document.createElement('div');
+  teamCard.classList.add('team-card');
+
+  const teamName = document.createElement('h3');
+  teamName.textContent = team.name;
+  teamCard.appendChild(teamName);
+
+  const teamInfo = document.createElement('p');
+  teamInfo.textContent = `${team.players} players · ${team.location}`;
+  teamCard.appendChild(teamInfo);
+
+  const contactInfo = document.createElement('p');
+  contactInfo.textContent = team.contact;
+  teamCard.appendChild(contactInfo);
+
+  teamsContainer.appendChild(teamCard);
+}
 
 // Function to add a new team to the JSON file and display its card
 async function addTeam(event) {
@@ -17,7 +41,7 @@ async function addTeam(event) {
 
   try {
     // Send the new team data to Formspree
-    const response = await fetch('https://formspree.io/f/<your-formspree-form-id>', {
+    const response = await fetch('https://formspree.io/f/mbjeyegq', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -50,70 +74,9 @@ async function addTeam(event) {
   }
 }
 
-
-// Function to create a new team card and append it to the container
-function createTeamCard(team) {
-  // Create the card element
-  const card = document.createElement('div');
-  card.classList.add('team-card');
-
-  // Create the card header element
-  const cardHeader = document.createElement('div');
-  cardHeader.classList.add('team-card-header');
-
-  // Create the card title element
-  const cardTitle = document.createElement('h2');
-  cardTitle.classList.add('team-card-title');
-  cardTitle.textContent = team.name;
-
-  // Create the card subtitle element
-  const cardSubtitle = document.createElement('h3');
-  cardSubtitle.classList.add('team-card-subtitle');
-  cardSubtitle.textContent = `${team.players} players · ${team.location}`;
-
-  // Create the card body element
-  const cardBody = document.createElement('div');
-  cardBody.classList.add('team-card-body');
-
-  // Create the card contact element
-  const cardContact = document.createElement('p');
-  cardContact.classList.add('team-card-contact');
-  cardContact.textContent = team.contact;
-
-  // Append the elements to the card
-  cardHeader.appendChild(cardTitle);
-  cardHeader.appendChild(cardSubtitle);
-  cardBody.appendChild(cardContact);
-  card.appendChild(cardHeader);
-  card.appendChild(cardBody);
-
-  // Append the card to the container
-  teamsContainer.appendChild(card);
-}
-
-// Function to add a new team to the JSON file and display its card
-function addTeam(event) {
-  event.preventDefault();
-  const name = addTeamForm.elements['name-input'].value;
-  const players = addTeamForm.elements['players-input'].value;
-  const location = addTeamForm.elements['location-input'].value;
-  const contact = addTeamForm.elements['contact-input'].value;
-
-  const newTeam = { name, players: parseInt(players), location, contact };
-
-  fetch('https://formspree.io/f/mbjeyegq', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(newTeam)
-  })
-    .then(response => response.json())
-    .then(team => {
-      createTeamCard(team);
-      addTeamForm.reset();
-    });
-}
-
-// Fetch the teams data when the page loads
+// Call the getTeams function to display the existing teams
 getTeams();
+
+// Add an event listener to the "Add Team" form
+const addTeamForm = document.getElementById('add-team-form');
+addTeamForm.addEventListener('submit', addTeam);
