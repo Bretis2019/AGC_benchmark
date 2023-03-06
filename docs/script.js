@@ -1,62 +1,12 @@
-const teamsContainer = document.getElementById('teams-container');
+const teamsUrl = 'https://bretis2019.github.io/AGC_benchmark/teams.json';
+const addButton = document.getElementById('add-team-button');
+const teamForm = document.getElementById('team-form');
 
-// Render teams from the teams.json file
-async function renderTeams() {
-  try {
-    const response = await fetch('teams.json');
-    const teams = await response.json();
-    teams.forEach((team) => {
-      renderTeam(team);
-    });
-  } catch (error) {
-    console.error(error);
-  }
-}
+addButton.addEventListener('click', () => {
+  teamForm.style.display = 'block';
+});
 
-// Render a single team
-function renderTeam(team) {
-  const teamCard = document.createElement('div');
-  teamCard.classList.add('team-card');
-
-  const nameElement = document.createElement('h2');
-  nameElement.textContent = team.name;
-  teamCard.appendChild(nameElement);
-
-  const playersElement = document.createElement('p');
-  playersElement.textContent = `Number of players: ${team.players}`;
-  teamCard.appendChild(playersElement);
-
-  const locationElement = document.createElement('p');
-  locationElement.textContent = `Location: ${team.location}`;
-  teamCard.appendChild(locationElement);
-
-  const contactButton = document.createElement('button');
-  contactButton.textContent = 'Contact Team';
-  contactButton.addEventListener('click', async () => {
-    const contactInfo = await getContactInfo(team.contact);
-    const contactElement = document.createElement('p');
-    contactElement.textContent = `Email: ${contactInfo.email}`;
-    teamCard.appendChild(contactElement);
-    contactButton.remove();
-  });
-  teamCard.appendChild(contactButton);
-
-  teamsContainer.appendChild(teamCard);
-}
-
-// Get contact info for a team
-async function getContactInfo(contactUrl) {
-  try {
-    const response = await fetch(contactUrl);
-    return await response.json();
-  } catch (error) {
-    console.error(error);
-    return { email: 'Unavailable' };
-  }
-}
-
-// Handle form submission to add a new team
-async function addTeam(event) {
+teamForm.addEventListener('submit', async (event) => {
   event.preventDefault();
 
   const name = document.getElementById('name-input').value;
@@ -65,30 +15,81 @@ async function addTeam(event) {
   const contact = document.getElementById('contact-input').value;
 
   const newTeam = {
-    name,
+    name: name,
     players: parseInt(players),
-    location,
-    contact
+    location: location,
+    contact: contact
   };
 
-  try {
-    const response = await fetch('/.netlify/functions/addTeam', {
-      method: 'POST',
-      body: JSON.stringify(newTeam)
-    });
+  const teamsContent = await fetch(teamsUrl).then(response => response.json());
+  const teams = JSON.parse(atob(teamsContent.content));
+  teams.push(newTeam);
+  const newContent = JSON.stringify(teams, null, 2);
+  const newContentEncoded = btoa(newContent);
 
-    if (response.ok) {
-      console.log('New team added successfully.');
-      renderTeam(newTeam);
-      document.getElementById('add-team-form').reset();
-    } else {
-      console.error('Failed to add new team.');
-    }
-  } catch (error) {
-    console.error(error);
+  const token = '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';
+  const branch = 'main';
+  const commitMessage = 'Add new team';
+  const contentSha = teamsContent.sha;
+
+  const response = await fetch(teamsUrl, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      message: commitMessage,
+      content: newContentEncoded,
+      sha: contentSha,
+      branch: branch
+    })
+  });
+
+  if (response.status === 200) {
+    teams.push(newTeam);
+    displayTeams(teams);
+    teamForm.reset();
+    teamForm.style.display = 'none';
+  } else {
+    console.error('Failed to add team:', response);
   }
+});
+
+async function fetchTeams() {
+  const response = await fetch(teamsUrl);
+  const content = await response.json();
+  const teams = JSON.parse(atob(content.content));
+  displayTeams(teams);
 }
 
-// Initialize the app
-renderTeams();
-document.getElementById('add-team-form').addEventListener('submit', addTeam);
+function displayTeams(teams) {
+  const teamsContainer = document.getElementById('teams-container');
+  teamsContainer.innerHTML = '';
+
+  teams.forEach(team => {
+    const teamCard = document.createElement('div');
+    teamCard.className = 'team-card';
+
+    const teamName = document.createElement('h2');
+    teamName.textContent = team.name;
+
+    const teamPlayers = document.createElement('p');
+    teamPlayers.textContent = `Players: ${team.players}`;
+
+    const teamLocation = document.createElement('p');
+    teamLocation.textContent = `Location: ${team.location}`;
+
+    const teamContact = document.createElement('p');
+    teamContact.textContent = `Contact: ${team.contact}`;
+
+    teamCard.appendChild(teamName);
+    teamCard.appendChild(teamPlayers);
+    teamCard.appendChild(teamLocation);
+    teamCard.appendChild(teamContact);
+
+    teamsContainer.appendChild(teamCard);
+  });
+}
+
+fetchTeams();
