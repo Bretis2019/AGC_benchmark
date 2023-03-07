@@ -1,95 +1,69 @@
-const teamsUrl = 'https://bretis2019.github.io/AGC_benchmark/teams.json';
-const addButton = document.getElementById('add-team-button');
-const teamForm = document.getElementById('team-form');
+// Client ID and API key from the Google Developers Console
+const CLIENT_ID = '704072422405-rjclfm5u5bgsmg7kcodeqku32jvaf1g1.apps.googleusercontent.com';
+const API_KEY = 'AIzaSyCyrmhdn5LhTqsU_R82iO6Ezhb_HaavKgc';
 
-addButton.addEventListener('click', () => {
-  teamForm.style.display = 'block';
-});
+// ID of the Google Sheet containing the team information
+const SPREADSHEET_ID = '14ZEtv7YBmjvKt9iW8aDTYi2T9Q99mKXHu34rLunkZyE';
 
-teamForm.addEventListener('submit', async (event) => {
-  event.preventDefault();
+// Range of the cells containing the team information
+const RANGE = 'Sheet1!A2:D';
 
-  const name = document.getElementById('name-input').value;
-  const players = document.getElementById('players-input').value;
-  const location = document.getElementById('location-input').value;
-  const contact = document.getElementById('contact-input').value;
+// Array of team objects retrieved from the Google Sheet
+let teams = [];
 
-  const newTeam = {
-    name: name,
-    players: parseInt(players),
-    location: location,
-    contact: contact
-  };
+// Load the Google Sheets API client library
+gapi.load('client', start);
 
-  const teamsContent = await fetch(teamsUrl).then(response => response.json());
-  const teams = JSON.parse(atob(teamsContent.content));
-  teams.push(newTeam);
-  const newContent = JSON.stringify(teams, null, 2);
-  const newContentEncoded = btoa(newContent);
-
-  const token = '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';
-  const branch = 'main';
-  const commitMessage = 'Add new team';
-  const contentSha = teamsContent.sha;
-
-  const response = await fetch(teamsUrl, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify({
-      message: commitMessage,
-      content: newContentEncoded,
-      sha: contentSha,
-      branch: branch
-    })
+// Initialize the API client library and make the request to get the team information
+function start() {
+  gapi.client.init({
+    apiKey: API_KEY,
+    clientId: CLIENT_ID,
+    discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+    scope: 'https://www.googleapis.com/auth/spreadsheets.readonly'
+  }).then(() => {
+    return gapi.client.sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID,
+      range: RANGE
+    });
+  }).then(response => {
+    const values = response.result.values;
+    if (values.length > 0) {
+      teams = values.map(row => ({
+        name: row[0],
+        players: row[1],
+        location: row[2],
+        contact: row[3]
+      }));
+      displayTeams();
+    } else {
+      console.log('No data found.');
+    }
+  }).catch(err => {
+    console.log('Error: ' + err.message);
   });
-
-  if (response.status === 200) {
-    teams.push(newTeam);
-    displayTeams(teams);
-    teamForm.reset();
-    teamForm.style.display = 'none';
-  } else {
-    console.error('Failed to add team:', response);
-  }
-});
-
-async function fetchTeams() {
-  const response = await fetch(teamsUrl);
-  const content = await response.json();
-  const teams = JSON.parse(atob(content.content));
-  displayTeams(teams);
 }
 
-function displayTeams(teams) {
+// Display the team information on the page
+function displayTeams() {
   const teamsContainer = document.getElementById('teams-container');
-  teamsContainer.innerHTML = '';
 
-  teams.forEach(team => {
+  teams.forEach((team) => {
     const teamCard = document.createElement('div');
-    teamCard.className = 'team-card';
+    teamCard.classList.add('team-card');
 
-    const teamName = document.createElement('h2');
-    teamName.textContent = team.name;
+    const nameElement = document.createElement('h2');
+    nameElement.textContent = team.name;
+    teamCard.appendChild(nameElement);
 
-    const teamPlayers = document.createElement('p');
-    teamPlayers.textContent = `Players: ${team.players}`;
+    const playersElement = document.createElement('p');
+    playersElement.textContent = `Number of players: ${team.players}`;
+    teamCard.appendChild(playersElement);
 
-    const teamLocation = document.createElement('p');
-    teamLocation.textContent = `Location: ${team.location}`;
+    const locationElement = document.createElement('p');
+    locationElement.textContent = `Location: ${team.location}`;
+    teamCard.appendChild(locationElement);
 
-    const teamContact = document.createElement('p');
-    teamContact.textContent = `Contact: ${team.contact}`;
-
-    teamCard.appendChild(teamName);
-    teamCard.appendChild(teamPlayers);
-    teamCard.appendChild(teamLocation);
-    teamCard.appendChild(teamContact);
-
-    teamsContainer.appendChild(teamCard);
-  });
-}
-
-fetchTeams();
+    const contactButton = document.createElement('button');
+    contactButton.textContent = 'Contact Team';
+    contact
