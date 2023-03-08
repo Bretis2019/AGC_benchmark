@@ -9,8 +9,8 @@ req.onreadystatechange = function() {
       const data = JSON.parse(req.responseText);
       const teamCards = data.record.map(team => {
         if (team.name.toLowerCase().includes(searchInput.value.toLowerCase()) ||
-            team.location.toLowerCase().includes(searchInput.value.toLowerCase()) ||
-            team.players.toString().includes(searchInput.value)) {
+            team.To.toLowerCase().includes(searchInput.value.toLowerCase()) ||
+            team.From.toString().includes(searchInput.value)) {
           return `<div class="team-card">
             <h2>${team.name}</h2>
             <p><strong>From:</strong> ${team.from}</p>
