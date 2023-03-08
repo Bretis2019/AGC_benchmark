@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="UTF-8">
-    <title>Teams</title>
-    <link rel="stylesheet" href="styles.css">
-  </head>
-  <body>
-    <h1>Teams</h1>
-    <div id="teams-container"></div>
+    <title>Team Information</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+    <h1>Team Information</h1>
+    <div>
+        <label for="search-input">Search by name, city, or number of players:</label>
+        <input type="text" id="search-input" name="search-input">
+    </div>
+    <div id="team-cards"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="script.js"></script>
-  </body>
+</body>
 </html>

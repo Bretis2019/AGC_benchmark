@@ -1,45 +1,39 @@
-const teamsContainer = document.getElementById('teams-container');
-
+const API_KEY = "$2b$10$h17YnRI5nIE2YLT2ueTpXuuM7hzYrLKROLfRi81H0Kz7DadgplIPK";
+const API_URL = "https://api.jsonbin.io/v3/b/64079dfdace6f33a22eaf72c";
 const req = new XMLHttpRequest();
+const searchInput = document.getElementById("search-input");
 
-req.onreadystatechange = () => {
-  if (req.readyState == XMLHttpRequest.DONE) {
-    if (req.status == 200) {
-      const teams = JSON.parse(req.responseText);
-      teams.forEach((team) => {
-        const teamCard = document.createElement('div');
-        teamCard.classList.add('team-card');
-
-        const nameElement = document.createElement('h2');
-        nameElement.textContent = team.name;
-        teamCard.appendChild(nameElement);
-
-        const playersElement = document.createElement('p');
-        playersElement.textContent = `Number of players: ${team.players}`;
-        teamCard.appendChild(playersElement);
-
-        const locationElement = document.createElement('p');
-        locationElement.textContent = `Location: ${team.location}`;
-        teamCard.appendChild(locationElement);
-
-        const contactButton = document.createElement('button');
-        contactButton.textContent = 'Contact Team';
-        contactButton.addEventListener('click', () => {
-          const contactInfo = document.createElement('p');
-          contactInfo.textContent = `Email: ${team.contact}`;
-          teamCard.appendChild(contactInfo);
-          contactButton.remove();
-        });
-        teamCard.appendChild(contactButton);
-
-        teamsContainer.appendChild(teamCard);
-      });
+req.onreadystatechange = function() {
+  if (req.readyState === XMLHttpRequest.DONE) {
+    if (req.status === 200) {
+      const data = JSON.parse(req.responseText);
+      const teamCards = data.record.map(team => {
+        if (team.name.toLowerCase().includes(searchInput.value.toLowerCase()) ||
+            team.location.toLowerCase().includes(searchInput.value.toLowerCase()) ||
+            team.players.toString().includes(searchInput.value)) {
+          return `<div class="team-card">
+            <h2>${team.name}</h2>
+            <p><strong>Players:</strong> ${team.players}</p>
+            <p><strong>Location:</strong> ${team.location}</p>
+            <p><strong>Contact:</strong> ${team.contact}</p>
+          </div>`;
+        }
+      }).join('');
+      document.getElementById("team-cards").innerHTML = teamCards;
     } else {
-      console.log('Failed to fetch teams data.');
+      console.log("Error retrieving team information");
     }
   }
 };
 
-req.open("GET", "https://api.jsonbin.io/v3/b/64079dfdace6f33a22eaf72c/latest", true);
-req.setRequestHeader("X-Master-Key", "$2b$10$h17YnRI5nIE2YLT2ueTpXuuM7hzYrLKROLfRi81H0Kz7DadgplIPK");
+req.open("GET", API_URL, true);
+req.setRequestHeader("X-Master-Key", API_KEY);
 req.send();
+
+searchInput.addEventListener("keyup", function(event) {
+  if (event.key === "Enter") {
+    req.open("GET", API_URL, true);
+    req.setRequestHeader("X-Master-Key", API_KEY);
+    req.send();
+  }
+});
