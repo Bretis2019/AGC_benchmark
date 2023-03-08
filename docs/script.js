@@ -13,8 +13,8 @@ req.onreadystatechange = function() {
             team.players.toString().includes(searchInput.value)) {
           return `<div class="team-card">
             <h2>${team.name}</h2>
-            <p><strong>Players:</strong> ${team.players}</p>
-            <p><strong>Location:</strong> ${team.location}</p>
+            <p><strong>From:</strong> ${team.from}</p>
+            <p><strong>To:</strong> ${team.to}</p>
             <p><strong>Contact:</strong> ${team.contact}</p>
           </div>`;
         }
