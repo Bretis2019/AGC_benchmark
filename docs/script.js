@@ -10,7 +10,7 @@ req.onreadystatechange = function() {
       const teamCards = data.record.map(team => {
         if (team.name.toLowerCase().includes(searchInput.value.toLowerCase()) ||
             team.To.toLowerCase().includes(searchInput.value.toLowerCase()) ||
-            team.From.toString().includes(searchInput.value)) {
+            team.From.toLowerCase().includes(searchInput.value.toLowerCase()) {
           return `<div class="team-card">
             <h2>${team.name}</h2>
             <p><strong>From:</strong> ${team.from}</p>
